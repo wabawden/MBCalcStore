@@ -1,0 +1,22 @@
+.side-menu {
+    background-color: lightgray;
+    padding: 6px;
+    height: 100vh;
+}
+
+.right-content {
+    padding: 6px;
+    padding-left: 24px;
+}
+
+#hide-menu {
+    /* display: none; */
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.date-time {
+    font-size: small;
+}

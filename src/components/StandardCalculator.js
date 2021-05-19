@@ -1,6 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-function round(value, precision) {
+import { saveCalc } from '../actions';
+
+export function round(value, precision) {
     if (Number.isInteger(precision)) {
       var shift = Math.pow(10, precision);
       // Limited preventing decimal issue
@@ -13,32 +16,45 @@ function round(value, precision) {
 class StandardCalculator extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {stake: '', backodds: '', layodds: '', commission: 0}
+        this.state = {id: null, name: '', stake: '', backodds: '', layodds: '', commission: 0, profit: '', date: '', time: ''}
     
         this.handleStake = this.handleStake.bind(this);
         this.handleBackodds = this.handleBackodds.bind(this);
         this.handleLayodds = this.handleLayodds.bind(this);
         this.handleCommission = this.handleCommission.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleName = this.handleName.bind(this);
     
     }
+        renderNameError = () => {
+          return <div>You Must Supply a name</div>
+        }
+
+        onSave = () => {
+          if (this.state.name) {
+            this.props.saveCalc(this.state);
+          } else {
+            return this.renderNameError()
+          };
+        };
 
         calculate = () => {
-            console.log(this.state);
-            console.log("hello from calculate");
             var standardStake = (parseFloat(this.state.stake)*parseFloat(this.state.backodds))/parseFloat(this.state.layodds);
             var standardStakeWithComm = round(standardStake + ((((parseFloat(this.state.commission)/100)*standardStake))/parseFloat(this.state.layodds)), 2);
             var standardProfitLoss = round(parseFloat(standardStakeWithComm - this.state.stake - ((parseFloat(this.state.commission)/100)*standardStake)), 2);
             var standardLiability = round(standardStakeWithComm*(parseFloat(this.state.layodds)-1), 2);
-            var underlayStake = (parseFloat(this.state.stake))
-            console.log(standardStake);
-            console.log(standardStakeWithComm);
             if (standardStakeWithComm) {
                 return (
                     <div>
                         <h2>Standard Lay</h2>
-                        <div>Stake: £{standardStakeWithComm} {standardProfitLoss > 0 ? "Profit" : "Loss"} £{standardProfitLoss}</div>
-                        <div>Liability: £{standardLiability}</div>
+                        <h3>Stake: £{standardStakeWithComm}</h3>
+                        <h3>{standardProfitLoss > 0 ? "Profit" : "Loss"} <span style={{ color: (standardProfitLoss > 0 ? 'green' : 'red') }}>£{standardProfitLoss}</span></h3>
+                        <h3>Liability: £{standardLiability}</h3>
+                        <div className="form-group">
+                            <label>Name </label>
+                            <input type="text" id="name" className="form-control" name="name" value={this.state.name} onChange={this.handleName} />
+                        </div>
+                        <button className="btn btn-primary" onClick={this.onSave}>Save</button>
                     </div>
                     );
             } else {
@@ -61,6 +77,14 @@ class StandardCalculator extends React.Component {
       handleCommission(event) {
         this.setState({commission: event.target.value});
       }
+
+      handleName(event) {
+        this.setState({name: event.target.value});
+        this.setState({date: new Date(Date.now()).toDateString()});
+        this.setState({time: new Date(Date.now()).getHours() + ":" + (new Date(Date.now()).getMinutes().length < 2 ? "0" : "") + new Date(Date.now()).getMinutes()});
+        this.setState({id: this.props.calcs ? (this.props.calcs.length + 1) : 1 });
+      }
+
     
       handleSubmit(event) {
         this.calculate();
@@ -69,6 +93,7 @@ class StandardCalculator extends React.Component {
         render() {
             return (
                 <div>
+                  <h2>Standard Calculator</h2>
                     <form onSubmit={this.handleSubmit}>
                         <div className="form-group">
                             <label>Stake </label>
@@ -94,4 +119,10 @@ class StandardCalculator extends React.Component {
         }
 }
 
-export default StandardCalculator;
+const mapStateToProps = (state) => {
+  return{
+    calcs: state.calc
+  };
+};
+
+export default connect(mapStateToProps, { saveCalc })(StandardCalculator);
