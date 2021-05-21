@@ -4,6 +4,10 @@
     height: 100vh;
 }
 
+.side-menu a {
+    text-decoration: none;
+}
+
 .right-content {
     padding: 6px;
     padding-left: 24px;

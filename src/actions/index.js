@@ -13,7 +13,6 @@ export const fetchCalcs = () => {
 };
 
 export const fetchCalc = (calc) => {
-    console.log("hello from fetch calc")
     return {
       type: 'FETCH_CALC',
       payload: calc

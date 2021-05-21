@@ -21,7 +21,7 @@ const App = () => {
                   </div>
             <div className="right-content">
                 <Route path="/" exact component={StandardCalculator} />
-                <Route path="/standard/:id" component={CalcShow} />
+                <Route path="/standard/:id" exact component={CalcShow} />
             </div>
           </div>
       </BrowserRouter>

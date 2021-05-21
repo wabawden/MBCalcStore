@@ -23,9 +23,13 @@ class SideMenu extends React.Component {
     renderCalcs() {
         return this.props.calcs.map(calc => {
             return <Link to={`/standard/${calc.id}`} className="item">
-                        <li onClick={() => this.props.fetchCalc(calc)} key={calc.name}className="list-group-item">{calc.name}
+                        <li onClick={() => this.props.fetchCalc(calc)}
+                            key={calc.name}
+                            className="list-group-item"
+                            style={{ backgroundColor: (calc.done ? '#c2fcc9' : '#fff') }}>
+                                {calc.name}
                         <br />
-                        <h3>{calc.backodds}/{calc.layodds}</h3>
+                        <h3>{calc.backodds}/{calc.layodds} <span style={{ color: (calc.profit > 0 ? 'green' : 'red') }}>£{calc.profit}</span></h3>
                         <span className="date-time">{calc.date} - {calc.time}</span></li>
                     </Link>
         });

@@ -13,10 +13,21 @@ export function round(value, precision) {
     }
   } 
 
+var standardProfitLoss;
+
 class StandardCalculator extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {id: null, name: '', stake: '', backodds: '', layodds: '', commission: 0, profit: '', date: '', time: ''}
+        this.state = {id: null,
+                      name: '',
+                      stake: '',
+                      backodds: '',
+                      layodds: '',
+                      commission: 0,
+                      profit: '',
+                      date: '',
+                      time: '',
+                      done: false}
     
         this.handleStake = this.handleStake.bind(this);
         this.handleBackodds = this.handleBackodds.bind(this);
@@ -24,6 +35,7 @@ class StandardCalculator extends React.Component {
         this.handleCommission = this.handleCommission.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleName = this.handleName.bind(this);
+        this.handleDone = this.handleDone.bind(this);
     
     }
         renderNameError = () => {
@@ -33,6 +45,7 @@ class StandardCalculator extends React.Component {
         onSave = () => {
           if (this.state.name) {
             this.props.saveCalc(this.state);
+            this.setState({})
           } else {
             return this.renderNameError()
           };
@@ -41,7 +54,7 @@ class StandardCalculator extends React.Component {
         calculate = () => {
             var standardStake = (parseFloat(this.state.stake)*parseFloat(this.state.backodds))/parseFloat(this.state.layodds);
             var standardStakeWithComm = round(standardStake + ((((parseFloat(this.state.commission)/100)*standardStake))/parseFloat(this.state.layodds)), 2);
-            var standardProfitLoss = round(parseFloat(standardStakeWithComm - this.state.stake - ((parseFloat(this.state.commission)/100)*standardStake)), 2);
+            standardProfitLoss = round(parseFloat(standardStakeWithComm - this.state.stake - ((parseFloat(this.state.commission)/100)*standardStake)), 2);
             var standardLiability = round(standardStakeWithComm*(parseFloat(this.state.layodds)-1), 2);
             if (standardStakeWithComm) {
                 return (
@@ -52,7 +65,21 @@ class StandardCalculator extends React.Component {
                         <h3>Liability: £{standardLiability}</h3>
                         <div className="form-group">
                             <label>Name </label>
-                            <input type="text" id="name" className="form-control" name="name" value={this.state.name} onChange={this.handleName} />
+                            <input type="text"
+                                    id="name"
+                                    className="form-control"
+                                    name="name"
+                                    value={this.state.name}
+                                    onChange={this.handleName} />
+                        </div>
+                        <div className="form-check">
+                            <label className="form-check-label">Done?</label>
+                            <input type="checkbox"
+                                    id="done"
+                                    className="form-check-input"
+                                    name="done"
+                                    value={this.state.done}
+                                    onChange={this.handleDone} />
                         </div>
                         <button className="btn btn-primary" onClick={this.onSave}>Save</button>
                     </div>
@@ -79,16 +106,20 @@ class StandardCalculator extends React.Component {
       }
 
       handleName(event) {
-        this.setState({name: event.target.value});
-        this.setState({date: new Date(Date.now()).toDateString()});
-        this.setState({time: new Date(Date.now()).getHours() + ":" + (new Date(Date.now()).getMinutes().length < 2 ? "0" : "") + new Date(Date.now()).getMinutes()});
-        this.setState({id: this.props.calcs ? (this.props.calcs.length + 1) : 1 });
+        this.setState({name: event.target.value,
+                      profit: standardProfitLoss,
+                      date: new Date(Date.now()).toDateString(),
+                      time: new Date(Date.now()).getHours() + ":" + (new Date(Date.now()).getMinutes().length < 2 ? "0" : "") + new Date(Date.now()).getMinutes(),
+                      id: this.props.calcs ? (this.props.calcs.length + 1) : 1 });
       }
 
+      handleDone(event) {
+        this.setState({done: event.target.checked});
+        console.log(event.target.checked);
+      }
     
       handleSubmit(event) {
         this.calculate();
-        event.preventDefault();
       }
         render() {
             return (
